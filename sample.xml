@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="PaymentServiceTest" tests="3" failures="1">
+  <testcase classname="com.demo.PaymentServiceTest" name="testCharge" time="0.12"/>
+  <testcase classname="com.demo.PaymentServiceTest" name="testRetry" time="1.5">
+    <failure message="expected 200 but was 503">stack trace here</failure>
+  </testcase>
+  <testcase classname="com.demo.PaymentServiceTest" name="testRefund" time="0.03">
+    <skipped/>
+  </testcase>
+</testsuite>
