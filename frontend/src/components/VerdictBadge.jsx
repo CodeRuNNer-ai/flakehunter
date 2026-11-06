@@ -1,3 +1,4 @@
 export default function VerdictBadge({ verdict }) {
-  return <span className={`badge badge-${verdict.toLowerCase()}`}>{verdict}</span>
+  const safeVerdict = String(verdict || 'INCONCLUSIVE').toLowerCase()
+  return <span className={`badge badge-${safeVerdict}`}>{verdict || 'INCONCLUSIVE'}</span>
 }

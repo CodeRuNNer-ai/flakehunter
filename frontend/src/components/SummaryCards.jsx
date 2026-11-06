@@ -1,19 +1,22 @@
 const CARDS = [
-  { key: 'ALL', label: 'Tests tracked', cls: 'card-all' },
-  { key: 'FLAKY', label: 'Flaky', cls: 'card-flaky' },
-  { key: 'BROKEN', label: 'Broken', cls: 'card-broken' },
-  { key: 'STABLE', label: 'Stable', cls: 'card-stable' },
+  { key: 'ALL', label: 'Tests tracked', tone: 'neutral' },
+  { key: 'FLAKY', label: 'Flaky', tone: 'flaky' },
+  { key: 'BROKEN', label: 'Broken', tone: 'broken' },
+  { key: 'STABLE', label: 'Stable', tone: 'stable' },
 ]
 
 export default function SummaryCards({ counts }) {
   return (
-    <section className="cards">
-      {CARDS.map((c) => (
-        <div key={c.key} className={`card ${c.cls}`}>
-          <div className="card-number">{counts[c.key] ?? 0}</div>
-          <div className="card-label">{c.label}</div>
-        </div>
+    <div className="summary-grid">
+      {CARDS.map((card) => (
+        <article key={card.key} className={`summary-card summary-${card.tone}`}>
+          <div className="summary-card-top">
+            <span className="summary-label">{card.label}</span>
+            <span className={`summary-indicator indicator-${card.tone}`} />
+          </div>
+          <div className="summary-value">{counts[card.key] ?? 0}</div>
+        </article>
       ))}
-    </section>
+    </div>
   )
 }
