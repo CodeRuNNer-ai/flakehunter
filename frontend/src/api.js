@@ -7,8 +7,10 @@ async function request(url, options) {
   return res.json()
 }
 
-export const fetchFlakyTests = (repo) =>
-  request(`/api/flaky-tests?repo=${encodeURIComponent(repo)}`)
+export const fetchFlakyTests = (repo, rerunMinutes) =>
+  request(
+    `/api/flaky-tests?repo=${encodeURIComponent(repo)}&rerunMinutes=${encodeURIComponent(rerunMinutes)}`,
+  )
 
 export const syncRepo = (repo) =>
   request(`/api/sync?repo=${encodeURIComponent(repo)}`, { method: 'POST' })

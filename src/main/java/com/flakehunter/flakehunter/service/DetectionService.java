@@ -9,8 +9,9 @@ import java.util.List;
 @Service
 public class DetectionService {
 
-    public record FlakyReport(String testName, String verdict, long runs,
-                              long failures, double failureRatePercent, long flakyCommits) {}
+    public record FlakyReport(String testName, String verdict, long runs, long failures,
+                              double failureRatePercent, long flakyCommits,
+                              double estimatedWastedMinutes) {}
 
     private final TestResultRepository repository;
 
@@ -18,7 +19,7 @@ public class DetectionService {
         this.repository = repository;
     }
 
-    public List<FlakyReport> analyze(String repo) {
+    public List<FlakyReport> analyze(String repo, double rerunMinutes) {
         return repository.statsForRepo(repo).stream()
                 .map(s -> {
                     long total = s.getTotal();
@@ -32,9 +33,17 @@ public class DetectionService {
                     else                         verdict = "INCONCLUSIVE"; // changed only across commits
 
                     double rate = total == 0 ? 0 : Math.round(1000.0 * failures / total) / 10.0;
-                    return new FlakyReport(s.getTestName(), verdict, total, failures, rate, flakyCommits);
+
+                    // Only flaky failures count as wasted reruns
+                    double wasted = verdict.equals("FLAKY")
+                            ? Math.round(failures * rerunMinutes * 10) / 10.0
+                            : 0.0;
+
+                    return new FlakyReport(s.getTestName(), verdict, total, failures,
+                            rate, flakyCommits, wasted);
                 })
                 .sorted(Comparator.comparing((FlakyReport r) -> !r.verdict().equals("FLAKY"))
+                        .thenComparing(Comparator.comparingDouble(FlakyReport::estimatedWastedMinutes).reversed())
                         .thenComparing(Comparator.comparingDouble(FlakyReport::failureRatePercent).reversed()))
                 .toList();
     }

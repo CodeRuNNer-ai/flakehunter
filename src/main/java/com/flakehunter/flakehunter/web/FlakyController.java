@@ -17,7 +17,9 @@ public class FlakyController {
     }
 
     @GetMapping("/flaky-tests")
-    public List<FlakyReport> flakyTests(@RequestParam String repo) {
-        return detectionService.analyze(repo);
+    public List<FlakyReport> flakyTests(@RequestParam String repo,
+                                        @RequestParam(defaultValue = "10") double rerunMinutes) {
+        double safe = Math.max(0, Math.min(rerunMinutes, 1000));
+        return detectionService.analyze(repo, safe);
     }
 }

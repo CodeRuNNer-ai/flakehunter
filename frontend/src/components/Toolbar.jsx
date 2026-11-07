@@ -1,59 +1,53 @@
-const FILTERS = ['ALL', 'FLAKY', 'BROKEN', 'STABLE', 'INCONCLUSIVE']
+const CHIPS = [
+  ['ALL', 'All'],
+  ['FLAKY', 'Flaky'],
+  ['BROKEN', 'Broken'],
+  ['STABLE', 'Stable'],
+  ['INCONCLUSIVE', 'Inconclusive'],
+];
 
 export default function Toolbar({
-  repoInput, onRepoInput, onSubmit, onSync, syncing, filter, onFilter, counts,
-  search, onSearch, repo,
+  repoInput, setRepoInput, rerunInput, setRerunInput,
+  onLoad, onSync, loading, syncing, filter, setFilter, counts,
 }) {
   return (
-    <section className="toolbar-panel" aria-label="Repository controls">
-      <form className="repo-form" onSubmit={onSubmit}>
+    <div className="toolbar">
+      <form className="repo-form" onSubmit={onLoad}>
         <label htmlFor="repo">Repository</label>
-        <div className="repo-input-wrap">
-          <span className="repo-prefix" aria-hidden="true">⌘</span>
-          <input
-            id="repo"
-            value={repoInput}
-            onChange={(e) => onRepoInput(e.target.value)}
-            placeholder="owner/repository"
-            spellCheck={false}
-            aria-label="GitHub repository"
-          />
-        </div>
-        <button type="submit" className="button button-primary">Load repository</button>
-        <button type="button" className="button button-secondary" onClick={onSync} disabled={syncing || !repo}>
-          <span className={syncing ? 'sync-icon is-spinning' : 'sync-icon'} aria-hidden="true">↻</span>
-          {syncing ? 'Syncing' : 'Sync from GitHub'}
+        <input
+          id="repo"
+          value={repoInput}
+          onChange={(e) => setRepoInput(e.target.value)}
+          placeholder="owner/repo"
+        />
+        <label htmlFor="rerun">Rerun cost (min)</label>
+        <input
+          id="rerun"
+          className="rerun-input"
+          type="number"
+          min="0"
+          max="1000"
+          value={rerunInput}
+          onChange={(e) => setRerunInput(e.target.value)}
+        />
+        <button type="submit" disabled={loading}>{loading ? 'Loading…' : 'Load'}</button>
+        <button type="button" className="secondary" onClick={onSync} disabled={syncing}>
+          {syncing ? 'Syncing…' : 'Sync from GitHub'}
         </button>
       </form>
 
-      <div className="toolbar-bottom">
-        <div className="filters" role="group" aria-label="Filter by verdict">
-          {FILTERS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              className={`filter-tab ${filter === value ? 'filter-tab-active' : ''}`}
-              onClick={() => onFilter(value)}
-              aria-pressed={filter === value}
-            >
-              {value === 'ALL' ? 'All tests' : value[0] + value.slice(1).toLowerCase()}
-              <span className="filter-count">{counts[value] ?? 0}</span>
-            </button>
-          ))}
-        </div>
-        <label className="search-box">
-          <span aria-hidden="true">⌕</span>
-          <input
-            value={search}
-            onChange={(e) => onSearch(e.target.value)}
-            placeholder="Find a test…"
-            aria-label="Search tests"
-          />
-          {search && (
-            <button type="button" className="clear-search" onClick={() => onSearch('')} aria-label="Clear search">×</button>
-          )}
-        </label>
+      <div className="filters">
+        {CHIPS.map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            className={`chip ${filter === key ? 'chip-active' : ''}`}
+            onClick={() => setFilter(key)}
+          >
+            {label} ({counts[key] || 0})
+          </button>
+        ))}
       </div>
-    </section>
-  )
+    </div>
+  );
 }
